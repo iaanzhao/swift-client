@@ -124,6 +124,13 @@ async function launchEaglerX(
 
   window.eaglercraftXOpts = buildEaglerOpts(settings, runtime);
 
+  // WASM singleplayer runs an integrated server worker from classes.js.
+  delete window.eaglercraftXClientScriptURL;
+  delete window.eaglercraftXClientScriptElement;
+  if (runtime === "wasm" && !viaBlocks && (version === "1.12" || version === "1.8")) {
+    window.eaglercraftXClientScriptURL = jsLoaderPath(version);
+  }
+
   const script =
     runtime === "wasm"
       ? wasmLoaderPath(version, viaBlocks)

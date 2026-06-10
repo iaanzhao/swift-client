@@ -45,14 +45,15 @@ curl -fL --progress-bar -o "$ROOT/public/game/1.12/wasm/assets.epw" \
 curl -fL -o "$ROOT/public/game/1.12/wasm/bootstrap.js" \
   "$BASE112/bootstrap.js"
 
-echo "==> Downloading Eaglercraft 1.12.2 JS classes (optional fallback)..."
+echo "==> Downloading Eaglercraft 1.12.2 JS classes (required for WASM singleplayer)..."
 curl -fL --progress-bar -o "$ROOT/public/game/1.12/js/classes.js" \
   "$BASE112/classes.js"
+bash "$ROOT/scripts/patch-112-spawner.sh"
 
 echo "==> Downloading Tuff Client ViaBlocks engine (~23 MB)..."
 TUFF_ZIP="$ROOT/public/game/tuff-wasm.zip"
 curl -fL --progress-bar -o "$TUFF_ZIP" \
-  "https://github.com/TuffNetwork/Tuff-Client-Builds/releases/download/1.1UT14/WASM.zip"
+  "https://github.com/TuffNetwork/Tuff-Client-Builds/releases/download/1.1UT15/WASM.zip"
 unzip -o -q "$TUFF_ZIP" -d "$ROOT/public/game/tuff/wasm"
 rm -f "$TUFF_ZIP"
 

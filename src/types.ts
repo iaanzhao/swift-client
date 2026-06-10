@@ -16,6 +16,8 @@ export interface ClientSettings {
   version: McVersion;
   viaTarget: ViaTarget;
   viaBlocks: boolean;
+  /** Load Tuff engine for below-Y=0 rendering (requires TuffX on server). */
+  y0Mode: boolean;
   runtime: Runtime;
   perfPreset: PerfPreset;
   username: string;
@@ -66,6 +68,9 @@ declare global {
   interface Window {
     eaglercraftXOpts?: EaglercraftXOpts;
     eaglercraftOpts?: unknown;
+    /** URL of classes.js for WASM integrated singleplayer server (worker). */
+    eaglercraftXClientScriptURL?: string;
+    eaglercraftXClientScriptElement?: HTMLScriptElement;
     main?: () => void | Promise<void>;
     __swiftClient?: {
       settings: ClientSettings;

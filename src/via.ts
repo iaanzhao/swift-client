@@ -57,5 +57,13 @@ export function viaHint(via: ViaTarget, client: McVersion): string {
     parts.push("Enable ViaBlocks below for newer block textures (Tuff engine).");
   }
 
+  if (via === "1.18" || via === "1.20" || via === "1.21") {
+    parts.push("Enable Y0 mode below to render blocks under Y=0 (needs TuffX on server).");
+  }
+
   return parts.join(" ");
+}
+
+export function y0RequiresTuffX(): string {
+  return "Server needs TuffX + ViaVersion + ViaBackwards on a 1.18+ backend.";
 }

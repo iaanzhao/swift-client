@@ -30,7 +30,7 @@ export const VERSIONS: Record<McVersion, VersionInfo> = {
   "1.12": {
     id: "1.12",
     label: "1.12.2",
-    tagline: "World of Color · enable ViaBlocks for newer blocks",
+    tagline: "World of Color · singleplayer needs classes.js (auto-configured)",
     engine: "eaglerX",
     wasmOnly: true,
     viaBlocksCapable: true,
@@ -38,7 +38,7 @@ export const VERSIONS: Record<McVersion, VersionInfo> = {
 };
 
 export function usesViaBlocks(settings: ClientSettings): boolean {
-  return settings.viaBlocks && settings.version === "1.12";
+  return settings.version === "1.12" && (settings.viaBlocks || settings.y0Mode);
 }
 
 export function tuffWasmAssetsPath(): string {

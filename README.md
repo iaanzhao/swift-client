@@ -19,15 +19,24 @@ Use the **Server version (Via)** dropdown to pick what Minecraft version your se
 
 Via translation happens on the **server**, not in the browser client. Your server owner must install those plugins for 1.16+ backends.
 
+## Y0 mode (below Y=0)
+
+Vanilla Eaglercraft hardcodes world height to **Y 0–255** and cannot render deepslate caves, trial chambers, or any blocks below bedrock. Swift Client solves this by loading the [Tuff Client](https://github.com/TuffNetwork/Tuff-Client-Builds) WASM engine — a patched Eaglercraft build with extended vertical rendering.
+
+1. Select **1.12.2** (or a **1.18+** Via server target — Y0 turns on automatically).
+2. Enable **Y0 mode** in the launcher.
+3. Install **[TuffX](https://github.com/TuffNetwork/TuffX-Plugin)** on your server (1.18+ backend + ViaVersion + ViaBackwards).
+
+Without TuffX on the server, the client still loads but blocks below Y=0 will not sync correctly.
+
 ## ViaBlocks (Tuff engine)
 
-Enable **ViaBlocks** in the launcher when playing on 1.12.2 with 1.16–1.21 servers. This loads the [Tuff Client](https://github.com/TuffNetwork/Tuff-Client-Builds) WASM engine, which includes:
+Enable **ViaBlocks** when playing on 1.12.2 with 1.16–1.21 servers. This uses the same Tuff engine and adds:
 
 - Newer block textures (deepslate, copper, etc.)
-- Y0 / below-bedrock support (with [TuffX](https://github.com/TuffNetwork/TuffX-Plugin) on the server)
 - WAILA, minimap, and Tuff's built-in ClickGUI
 
-Server requirements for full ViaBlocks: **TuffX + ViaVersion + ViaBackwards** on a 1.18+ backend.
+Y0 mode implies ViaBlocks. Server requirements: **TuffX + ViaVersion + ViaBackwards** on a 1.18+ backend for full support.
 
 ## Features
 
@@ -48,6 +57,12 @@ npm run dev
 ```
 
 Open http://localhost:5173, pick a version, and click **Play**.
+
+### 1.12 singleplayer
+
+WASM 1.12.2 runs singleplayer in a background worker that loads `classes.js`. Swift Client sets `window.eaglercraftXClientScriptURL` automatically. If you still see a mob spawner crash when creating a world, re-run `npm run setup` (applies a spawner tile-entity patch).
+
+For the most reliable singleplayer experience, use **1.8.8** — its integrated server is more mature.
 
 ## GitHub Pages
 

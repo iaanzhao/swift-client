@@ -6,6 +6,7 @@ const DEFAULTS: ClientSettings = {
   version: "1.8",
   viaTarget: "auto",
   viaBlocks: false,
+  y0Mode: false,
   runtime: "auto",
   perfPreset: "turbo",
   username: "",
@@ -48,6 +49,7 @@ export function loadSettings(): ClientSettings {
       version: parseVersion(parsed.version),
       viaTarget: parseViaTarget(parsed.viaTarget),
       viaBlocks: parsed.viaBlocks === true,
+      y0Mode: parsed.y0Mode === true,
     };
   } catch {
     return { ...DEFAULTS };

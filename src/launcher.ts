@@ -4,7 +4,7 @@ import { loadSettings, saveSettings } from "./storage";
 import type { ClientSettings, McVersion, PerfPreset, Runtime, ViaTarget } from "./types";
 import { ClickGui } from "./overlay/clickGui";
 import { OverlayHud } from "./overlay/hud";
-import { recommendedClient, viaHint, viaRequiresPlugins } from "./via";
+import { recommendedClient, viaHint, viaRequiresPlugins, y0RequiresTuffX } from "./via";
 import { usesViaBlocks, VERSIONS } from "./versions";
 
 let settings = loadSettings();
@@ -17,7 +17,10 @@ function $(sel: string): HTMLElement {
 
 function updatePlayButton(): void {
   const btn = $("#play-btn");
-  const suffix = usesViaBlocks(settings) ? " + ViaBlocks" : "";
+  const extras: string[] = [];
+  if (settings.y0Mode) extras.push("Y0");
+  if (settings.viaBlocks) extras.push("ViaBlocks");
+  const suffix = extras.length ? ` + ${extras.join(" · ")}` : "";
   btn.textContent = `Play Minecraft ${VERSIONS[settings.version].label}${suffix}`;
 }
 
@@ -34,27 +37,40 @@ function updateVersionHint(): void {
   const jsOption = runtimeSelect.querySelector('option[value="js"]') as HTMLOptionElement;
   const autoOption = runtimeSelect.querySelector('option[value="auto"]') as HTMLOptionElement;
   const info = VERSIONS[settings.version];
-  const viaBlocksOn = usesViaBlocks(settings);
+  const tuffEngine = usesViaBlocks(settings);
+  const y0Row = $("#y0-row");
+  const y0Hint = $("#y0-hint");
+  const y0Input = form.elements.namedItem("y0Mode") as HTMLInputElement;
   const viaBlocksRow = $("#viablocks-row");
   const viaBlocksHint = $("#viablocks-hint");
   const viaBlocksInput = form.elements.namedItem("viaBlocks") as HTMLInputElement;
 
   if (info.viaBlocksCapable) {
+    y0Row.classList.remove("hidden");
     viaBlocksRow.classList.remove("hidden");
+    y0Input.checked = settings.y0Mode;
     viaBlocksInput.checked = settings.viaBlocks;
-    viaBlocksHint.textContent = viaBlocksOn
-      ? "Using Tuff engine — install TuffX on server for Y0 & full ViaBlocks."
+    y0Hint.textContent = settings.y0Mode
+      ? `Tuff engine loaded. ${y0RequiresTuffX()}`
+      : "Vanilla Eaglercraft only renders Y 0–255. Enable this for deepslate caves & trial chambers.";
+    viaBlocksHint.textContent = tuffEngine
+      ? settings.y0Mode
+        ? "ViaBlocks included with Y0 mode (newer block textures, WAILA)."
+        : "Using Tuff engine — enable Y0 mode above for below-bedrock rendering."
       : "Renders newer blocks on 1.16+ servers (requires TuffX + Via plugins).";
   } else {
+    y0Row.classList.add("hidden");
     viaBlocksRow.classList.add("hidden");
+    y0Hint.textContent = "";
     viaBlocksHint.textContent = "";
-    if (settings.viaBlocks) {
+    if (settings.viaBlocks || settings.y0Mode) {
       settings.viaBlocks = false;
+      settings.y0Mode = false;
       saveSettings(settings);
     }
   }
 
-  if (viaBlocksOn) {
+  if (tuffEngine) {
     autoOption.disabled = true;
     wasmOption.disabled = false;
     jsOption.disabled = true;
@@ -93,6 +109,10 @@ function applyViaRecommendation(): void {
   if (viaRequiresPlugins(settings.viaTarget)) {
     settings.viaBlocks = true;
   }
+  if (settings.viaTarget === "1.18" || settings.viaTarget === "1.20" || settings.viaTarget === "1.21") {
+    settings.y0Mode = true;
+    settings.viaBlocks = true;
+  }
   saveSettings(settings);
 }
 
@@ -101,6 +121,7 @@ function updateForm(): void {
   (form.elements.namedItem("version") as HTMLSelectElement).value = settings.version;
   (form.elements.namedItem("viaTarget") as HTMLSelectElement).value = settings.viaTarget;
   (form.elements.namedItem("viaBlocks") as HTMLInputElement).checked = settings.viaBlocks;
+  (form.elements.namedItem("y0Mode") as HTMLInputElement).checked = settings.y0Mode;
   (form.elements.namedItem("runtime") as HTMLSelectElement).value = settings.runtime;
   (form.elements.namedItem("perf") as HTMLSelectElement).value = settings.perfPreset;
   (form.elements.namedItem("joinServer") as HTMLInputElement).value = settings.joinServer;
@@ -164,7 +185,12 @@ async function startGame(): Promise<void> {
 
   try {
     const { runtime, version, viaBlocks } = await launchGame(settings);
-    const mode = viaBlocks ? "ViaBlocks · Tuff ClickGUI" : "Right Shift = ClickGUI";
+    const y0 = settings.y0Mode;
+    const mode = viaBlocks
+      ? y0
+        ? "Y0 · ViaBlocks · Tuff ClickGUI"
+        : "ViaBlocks · Tuff ClickGUI"
+      : "Right Shift = ClickGUI";
     status.textContent = `${VERSIONS[version].label} · ${runtimeLabel(runtime)} · ${mode}`;
 
     if (!viaBlocks) {
@@ -210,8 +236,13 @@ export function initLauncher(): void {
       .value as McVersion;
     settings.viaTarget = (form.elements.namedItem("viaTarget") as HTMLSelectElement)
       .value as ViaTarget;
+    settings.y0Mode = (form.elements.namedItem("y0Mode") as HTMLInputElement).checked;
     settings.viaBlocks = (form.elements.namedItem("viaBlocks") as HTMLInputElement).checked;
-    if (settings.viaBlocks && settings.version !== "1.12") {
+    if (settings.y0Mode) {
+      settings.viaBlocks = true;
+      settings.version = "1.12";
+      settings.runtime = "wasm";
+    } else if (settings.viaBlocks && settings.version !== "1.12") {
       settings.version = "1.12";
     }
     settings.runtime = (form.elements.namedItem("runtime") as HTMLSelectElement)
@@ -232,6 +263,25 @@ export function initLauncher(): void {
         .value as McVersion;
       if (settings.version !== "1.12") {
         settings.viaBlocks = false;
+        settings.y0Mode = false;
+      }
+      saveSettings(settings);
+      updateForm();
+      refreshRuntimeBadge();
+    },
+  );
+
+  (form.elements.namedItem("y0Mode") as HTMLInputElement).addEventListener(
+    "change",
+    () => {
+      settings.y0Mode = (form.elements.namedItem("y0Mode") as HTMLInputElement).checked;
+      if (settings.y0Mode) {
+        settings.viaBlocks = true;
+        settings.version = "1.12";
+        settings.runtime = "wasm";
+        if (settings.viaTarget === "1.8" || settings.viaTarget === "1.12" || settings.viaTarget === "auto") {
+          settings.viaTarget = "1.18";
+        }
       }
       saveSettings(settings);
       updateForm();
@@ -243,6 +293,9 @@ export function initLauncher(): void {
     "change",
     () => {
       settings.viaBlocks = (form.elements.namedItem("viaBlocks") as HTMLInputElement).checked;
+      if (!settings.viaBlocks) {
+        settings.y0Mode = false;
+      }
       if (settings.viaBlocks) {
         settings.version = "1.12";
       }
