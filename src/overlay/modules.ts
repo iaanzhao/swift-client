@@ -12,6 +12,24 @@ export const MODULES: ModuleDef[] = [
   { id: "cps", name: "CPS Counter", category: "Combat", description: "Left/right clicks per second" },
   { id: "keystrokes", name: "Keystrokes", category: "HUD", description: "WASD + mouse overlay" },
   { id: "zoom", name: "Zoom", category: "Render", description: "Hold key to zoom in" },
+  {
+    id: "nametags",
+    name: "Entity Nametags",
+    category: "Render",
+    description: "Mob and item nametags (off = less lag)",
+  },
+  {
+    id: "playerNametags",
+    name: "Player Nametags",
+    category: "Render",
+    description: "Other players' nametags (off = less lag)",
+  },
+  {
+    id: "armorStandNametags",
+    name: "Armor Stand Nametags",
+    category: "Render",
+    description: "Leaderboard / hologram armor stands (off = less lag)",
+  },
   { id: "coords", name: "Coordinates", category: "HUD", description: "XYZ position (when in-game)" },
   { id: "clock", name: "Clock", category: "Utility", description: "Real-time clock" },
 ];

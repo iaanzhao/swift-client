@@ -38,6 +38,8 @@ Enable **ViaBlocks** when playing on 1.12.2 with 1.16–1.21 servers. This uses 
 
 Y0 mode implies ViaBlocks. Server requirements: **TuffX + ViaVersion + ViaBackwards** on a 1.18+ backend for full support.
 
+`npm run setup` always downloads the **newest [Tuff Client](https://github.com/TuffNetwork/Tuff-Client-Builds/releases) WASM build** (currently 1.1UT15+) plus Tuff's own `classes.js` for integrated singleplayer.
+
 ## Features
 
 - **Version picker** — switch between 1.8.8 and 1.12.2 from the launcher

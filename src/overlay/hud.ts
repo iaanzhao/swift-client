@@ -27,12 +27,10 @@ export class OverlayHud {
     this.root.id = "swift-overlay";
     this.root.innerHTML = `
       <div class="hud-tl"></div>
-      <div class="hud-tr"></div>
       <div class="hud-bl"></div>
     `;
 
     const tl = this.root.querySelector(".hud-tl")!;
-    const tr = this.root.querySelector(".hud-tr")!;
     const bl = this.root.querySelector(".hud-bl")!;
 
     this.fpsEl = this.badge("FPS —");
@@ -44,8 +42,6 @@ export class OverlayHud {
 
     tl.append(this.fpsEl, this.cpsEl, this.coordsEl, this.clockEl);
     bl.append(this.keysEl);
-    tr.id = "swift-zoom-hint";
-    tr.className = "zoom-hint hidden";
 
     document.body.appendChild(this.root);
     this.bindInput();
@@ -74,12 +70,6 @@ export class OverlayHud {
     this.toggle(this.coordsEl, s.modules.coords);
     this.toggle(this.clockEl, s.modules.clock);
     this.toggle(this.keysEl, s.modules.keystrokes);
-
-    const hint = this.root.querySelector("#swift-zoom-hint") as HTMLElement;
-    this.toggle(hint, s.modules.zoom);
-    if (s.modules.zoom) {
-      hint.textContent = `Zoom: ${s.zoomKey.toUpperCase()}`;
-    }
   }
 
   private toggle(el: HTMLElement, on: boolean): void {

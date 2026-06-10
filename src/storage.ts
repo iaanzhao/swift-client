@@ -2,8 +2,8 @@ import type { ClientSettings, McVersion, ViaTarget } from "./types";
 
 const KEY = "swift-client-settings";
 
-const DEFAULTS: ClientSettings = {
-  version: "1.8",
+export const DEFAULTS: ClientSettings = {
+  version: "1.12",
   viaTarget: "auto",
   viaBlocks: false,
   y0Mode: false,
@@ -11,16 +11,15 @@ const DEFAULTS: ClientSettings = {
   perfPreset: "turbo",
   username: "",
   joinServer: "",
-  servers: [
-    { name: "Hyper Network", addr: "wss://hyper-network.net/", via: true },
-    { name: "Local Test", addr: "ws://localhost:8081/" },
-  ],
   accentColor: "#6ee7b7",
   modules: {
     fps: true,
     cps: true,
     keystrokes: false,
-    zoom: true,
+    zoom: false,
+    nametags: true,
+    playerNametags: true,
+    armorStandNametags: true,
     coords: false,
     clock: false,
   },
@@ -29,8 +28,8 @@ const DEFAULTS: ClientSettings = {
 };
 
 function parseVersion(v: unknown): McVersion {
-  if (v === "1.12" || v === "1.5") return v;
-  return "1.8";
+  if (v === "1.8" || v === "1.5") return v;
+  return "1.12";
 }
 
 function parseViaTarget(v: unknown): ViaTarget {
@@ -50,6 +49,9 @@ export function loadSettings(): ClientSettings {
       viaTarget: parseViaTarget(parsed.viaTarget),
       viaBlocks: parsed.viaBlocks === true,
       y0Mode: parsed.y0Mode === true,
+      perfPreset: parsed.perfPreset ?? "turbo",
+      runtime: parsed.runtime ?? "auto",
+      joinServer: "",
     };
   } catch {
     return { ...DEFAULTS };

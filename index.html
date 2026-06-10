@@ -3,115 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Swift Client — fast browser Minecraft 1.8 & 1.12 on EaglercraftX" />
+    <meta name="description" content="Swift Client — fast browser Minecraft on EaglercraftX" />
     <title>Swift Client</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
   </head>
   <body>
-    <div id="launcher" class="launcher">
-      <div class="launcher-bg"></div>
-      <div class="launcher-card">
-        <header class="launcher-header">
-          <div class="logo">
-            <span class="logo-icon">⚡</span>
-            <div>
-              <h1>Swift Client</h1>
-              <p>Fast Eaglercraft · 1.5 / 1.8 / 1.12 · Via-ready</p>
-            </div>
-          </div>
-          <span id="runtime-badge" class="badge">detecting…</span>
-        </header>
-
-        <form id="launcher-form" class="launcher-form">
-          <label>
-            Minecraft version
-            <select name="version">
-              <option value="1.5">1.5.2 — legacy (EaglerXRewind)</option>
-              <option value="1.8">1.8.8 — stable PvP</option>
-              <option value="1.12">1.12.2 — World of Color</option>
-            </select>
-          </label>
-          <p id="version-hint" class="version-hint"></p>
-
-          <label>
-            Server version (Via)
-            <select name="viaTarget">
-              <option value="auto">Auto — match client</option>
-              <option value="1.8">1.8.x — native</option>
-              <option value="1.12">1.12.x — native</option>
-              <option value="1.16">1.16+ — Via plugins required</option>
-              <option value="1.18">1.18+ — Via plugins required</option>
-              <option value="1.20">1.20+ — Via plugins required</option>
-              <option value="1.21">1.21+ — Via plugins required</option>
-            </select>
-          </label>
-          <p id="via-hint" class="version-hint via-hint"></p>
-
-          <label class="checkbox-row" id="y0-row">
-            <input type="checkbox" name="y0Mode" />
-            <span>
-              <strong>Y0 mode</strong> — render blocks below Y=0 (Tuff engine)
-            </span>
-          </label>
-          <p id="y0-hint" class="version-hint"></p>
-
-          <label class="checkbox-row" id="viablocks-row">
-            <input type="checkbox" name="viaBlocks" />
-            <span>
-              <strong>ViaBlocks</strong> — newer block textures, WAILA, minimap
-            </span>
-          </label>
-          <p id="viablocks-hint" class="version-hint"></p>
-
-          <div class="field-row">
-            <label>
-              Runtime
-              <select name="runtime">
-                <option value="auto">Auto (WASM if supported)</option>
-                <option value="wasm">WASM-GC — fastest</option>
-                <option value="js">JavaScript — max compat</option>
-              </select>
-            </label>
-            <label>
-              Performance
-              <select name="perf">
-                <option value="turbo">Turbo — max FPS</option>
-                <option value="balanced">Balanced</option>
-                <option value="quality">Quality</option>
-              </select>
-            </label>
-          </div>
-
-          <label>
-            Quick connect (optional)
-            <input name="joinServer" type="text" placeholder="wss://your-server.example/" />
-          </label>
-
-          <section class="servers-section">
-            <div class="servers-head">
-              <h2>Servers</h2>
-              <button type="button" id="setup-hint" class="link-btn">Check game files</button>
-            </div>
-            <ul id="server-list" class="server-list"></ul>
-            <div class="add-server">
-              <input id="srv-name" type="text" placeholder="Server name" />
-              <input id="srv-addr" type="text" placeholder="wss://address/" />
-              <button type="button" id="add-server">Add</button>
-            </div>
-          </section>
-
-          <button type="submit" class="play-btn" id="play-btn">Play Minecraft 1.8.8</button>
-        </form>
-
-        <footer class="launcher-footer">
-          <span>Right Shift in-game → ClickGUI</span>
-          <span>Built on EaglercraftX · Not affiliated with Mojang</span>
-        </footer>
+    <div id="game-shell" class="game-shell">
+      <div id="home-title" class="home-title">
+        <span class="home-title-icon" aria-hidden="true">⚡</span>
+        <h1>Swift Client</h1>
       </div>
-    </div>
-
-    <div id="game-shell" class="game-shell hidden">
-      <div id="launch-status" class="launch-status">Loading…</div>
+      <div id="launch-status" class="launch-status">Starting…</div>
       <div id="game_frame"></div>
     </div>
 

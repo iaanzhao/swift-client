@@ -6,12 +6,6 @@ export type ViaTarget = "auto" | "1.8" | "1.12" | "1.16" | "1.18" | "1.20" | "1.
 
 export type PerfPreset = "turbo" | "balanced" | "quality";
 
-export interface ServerEntry {
-  addr: string;
-  name: string;
-  via?: boolean;
-}
-
 export interface ClientSettings {
   version: McVersion;
   viaTarget: ViaTarget;
@@ -22,7 +16,6 @@ export interface ClientSettings {
   perfPreset: PerfPreset;
   username: string;
   joinServer: string;
-  servers: ServerEntry[];
   accentColor: string;
   modules: Record<string, boolean>;
   zoomKey: string;
@@ -37,7 +30,7 @@ export interface EaglercraftXOpts {
   worldsDB: string;
   resourcePacksDB?: string;
   localStorageNamespace?: string;
-  servers: ServerEntry[];
+  servers?: Array<{ addr: string; name: string; via?: boolean }>;
   relays: Array<{ addr: string; comment: string; primary: boolean }>;
   joinServer?: string;
   enforceVSync?: boolean;
@@ -72,6 +65,11 @@ declare global {
     eaglercraftXClientScriptURL?: string;
     eaglercraftXClientScriptElement?: HTMLScriptElement;
     main?: () => void | Promise<void>;
+    __swiftNametags?: {
+      entityNametags: boolean;
+      playerNametags: boolean;
+      armorStandNametags: boolean;
+    };
     __swiftClient?: {
       settings: ClientSettings;
       overlay: { toggleClickGui: () => void };

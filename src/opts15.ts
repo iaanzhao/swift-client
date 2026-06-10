@@ -21,11 +21,7 @@ export function buildEagler15Opts(settings: ClientSettings): Eaglercraft15Opts {
     assetsURI: `${base}assets.epk`,
     serverWorkerURI: `${base}worker_bootstrap.js`,
     worldsFolder: "swift_worlds_15",
-    servers: settings.servers.map((s) => ({
-      serverName: s.name,
-      serverAddress: s.addr,
-      hideAddress: false,
-    })),
+    servers: [],
     relays: [
       { addr: "wss://relay.deev.is/", name: "lax1dude relay #1", primary: relayId === 0 },
       { addr: "wss://relay.lax1dude.net/", name: "lax1dude relay #2", primary: relayId === 1 },
@@ -40,10 +36,6 @@ export function buildEagler15Opts(settings: ClientSettings): Eaglercraft15Opts {
       eaglerLogo: false,
     },
   };
-
-  if (settings.joinServer.trim()) {
-    opts.joinServer = settings.joinServer.trim();
-  }
 
   return opts;
 }

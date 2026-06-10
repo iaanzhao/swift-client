@@ -6,6 +6,7 @@ import {
   jsAssetsPath,
   jsLoaderPath,
   jsWebrtcPath,
+  tuffJsLoaderPath,
   tuffWasmAssetsPath,
   usesViaBlocks,
   VERSIONS,
@@ -39,11 +40,12 @@ async function assetExists(url: string): Promise<boolean> {
 }
 
 async function hasTuffAssets(): Promise<boolean> {
-  const [loader, assets] = await Promise.all([
+  const [loader, assets, integrated] = await Promise.all([
     assetExists(wasmLoaderPath("1.12", true)),
     assetExists(tuffWasmAssetsPath()),
+    assetExists(tuffJsLoaderPath()),
   ]);
-  return loader && assets;
+  return loader && assets && integrated;
 }
 
 async function hasVersionAssets(
@@ -127,8 +129,12 @@ async function launchEaglerX(
   // WASM singleplayer runs an integrated server worker from classes.js.
   delete window.eaglercraftXClientScriptURL;
   delete window.eaglercraftXClientScriptElement;
-  if (runtime === "wasm" && !viaBlocks && (version === "1.12" || version === "1.8")) {
-    window.eaglercraftXClientScriptURL = jsLoaderPath(version);
+  if (runtime === "wasm") {
+    if (viaBlocks && version === "1.12") {
+      window.eaglercraftXClientScriptURL = tuffJsLoaderPath();
+    } else if (!viaBlocks && (version === "1.12" || version === "1.8")) {
+      window.eaglercraftXClientScriptURL = jsLoaderPath(version);
+    }
   }
 
   const script =

@@ -49,6 +49,10 @@ export function tuffWasmLoaderPath(): string {
   return assetUrl("game/tuff/wasm/bootstrap.js");
 }
 
+export function tuffJsLoaderPath(): string {
+  return assetUrl("game/tuff/js/classes.js");
+}
+
 export function wasmAssetsPath(version: McVersion, viaBlocks = false): string {
   if (viaBlocks && version === "1.12") return tuffWasmAssetsPath();
   return assetUrl(`game/${version}/wasm/assets.epw`);

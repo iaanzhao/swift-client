@@ -1,0 +1,5 @@
+{
+  "tag": "1.1UT15",
+  "wasmUrl": "https://github.com/TuffNetwork/Tuff-Client-Builds/releases/download/1.1UT15/WASM.zip",
+  "hasIntegratedServer": true
+}
