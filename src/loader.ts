@@ -1,9 +1,11 @@
+import { buildEagler15Opts } from "./opts15";
 import { buildEaglerOpts } from "./opts";
 import { resolveRuntime } from "./runtime";
 import type { ClientSettings, McVersion } from "./types";
 import {
   jsAssetsPath,
   jsLoaderPath,
+  jsWebrtcPath,
   VERSIONS,
   wasmAssetsPath,
   wasmLoaderPath,
@@ -35,14 +37,44 @@ async function assetExists(url: string): Promise<boolean> {
 }
 
 async function hasVersionAssets(version: McVersion): Promise<boolean> {
+  const info = VERSIONS[version];
+  if (info.engine === "eagler15") {
+    const [loader, assets] = await Promise.all([
+      assetExists(jsLoaderPath(version)),
+      assetExists(jsAssetsPath(version)),
+    ]);
+    return loader && assets;
+  }
   const wasmOk = await assetExists(wasmAssetsPath(version));
   const jsOk = await assetExists(jsLoaderPath(version));
   return wasmOk || jsOk;
 }
 
-export async function launchGame(
+async function launchEagler15(settings: ClientSettings): Promise<void> {
+  const version: McVersion = "1.5";
+  const loader = jsLoaderPath(version);
+  const assets = jsAssetsPath(version);
+
+  if (!(await assetExists(loader)) || !(await assetExists(assets))) {
+    throw new Error(
+      `Minecraft ${VERSIONS[version].label} files missing. Run \`npm run setup\` to download assets.`,
+    );
+  }
+
+  await loadScript(jsWebrtcPath(version));
+  window.eaglercraftOpts = buildEagler15Opts(settings);
+  await loadScript(loader);
+
+  if (typeof window.main !== "function") {
+    throw new Error("Eaglercraft 1.5 bootstrap did not initialize.");
+  }
+
+  await window.main();
+}
+
+async function launchEaglerX(
   settings: ClientSettings,
-): Promise<{ runtime: "wasm" | "js"; version: McVersion }> {
+): Promise<"wasm" | "js"> {
   const version = settings.version;
   let runtime = await resolveRuntime(settings.runtime, version);
 
@@ -72,6 +104,20 @@ export async function launchGame(
   }
 
   await window.main();
+  return runtime;
+}
+
+export async function launchGame(
+  settings: ClientSettings,
+): Promise<{ runtime: "wasm" | "js"; version: McVersion }> {
+  const version = settings.version;
+
+  if (VERSIONS[version].engine === "eagler15") {
+    await launchEagler15(settings);
+    return { runtime: "js", version };
+  }
+
+  const runtime = await launchEaglerX(settings);
   return { runtime, version };
 }
 

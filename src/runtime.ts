@@ -19,6 +19,7 @@ export async function resolveRuntime(
   pref: Runtime,
   version: McVersion,
 ): Promise<"wasm" | "js"> {
+  if (VERSIONS[version].jsOnly) return "js";
   if (VERSIONS[version].wasmOnly) return "wasm";
   if (pref === "wasm") return "wasm";
   if (pref === "js") return "js";
@@ -27,5 +28,6 @@ export async function resolveRuntime(
 
 export function runtimeLabel(rt: "wasm" | "js", version?: McVersion): string {
   const ver = version ? ` · ${VERSIONS[version].label}` : "";
+  if (version && VERSIONS[version].jsOnly) return `JavaScript${ver}`;
   return rt === "wasm" ? `WASM-GC (fast)${ver}` : `JavaScript (compat)${ver}`;
 }

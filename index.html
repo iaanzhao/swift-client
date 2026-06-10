@@ -16,7 +16,7 @@
             <span class="logo-icon">⚡</span>
             <div>
               <h1>Swift Client</h1>
-              <p>Fast EaglercraftX · 1.8 & 1.12 · WASM-first</p>
+              <p>Fast Eaglercraft · 1.5 / 1.8 / 1.12 · Via-ready</p>
             </div>
           </div>
           <span id="runtime-badge" class="badge">detecting…</span>
@@ -26,11 +26,26 @@
           <label>
             Minecraft version
             <select name="version">
+              <option value="1.5">1.5.2 — legacy (EaglerXRewind)</option>
               <option value="1.8">1.8.8 — stable PvP</option>
               <option value="1.12">1.12.2 — World of Color</option>
             </select>
           </label>
           <p id="version-hint" class="version-hint"></p>
+
+          <label>
+            Server version (Via)
+            <select name="viaTarget">
+              <option value="auto">Auto — match client</option>
+              <option value="1.8">1.8.x — native</option>
+              <option value="1.12">1.12.x — native</option>
+              <option value="1.16">1.16+ — Via plugins required</option>
+              <option value="1.18">1.18+ — Via plugins required</option>
+              <option value="1.20">1.20+ — Via plugins required</option>
+              <option value="1.21">1.21+ — Via plugins required</option>
+            </select>
+          </label>
+          <p id="via-hint" class="version-hint via-hint"></p>
 
           <div class="field-row">
             <label>

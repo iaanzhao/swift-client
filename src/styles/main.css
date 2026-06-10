@@ -122,6 +122,22 @@ body {
   color: var(--muted);
 }
 
+.via-hint {
+  color: color-mix(in srgb, var(--accent) 70%, var(--muted));
+}
+
+.via-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 4px;
+  padding: 1px 5px;
+  vertical-align: middle;
+}
+
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

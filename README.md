@@ -6,8 +6,18 @@ A fast, Tuff-inspired Eaglercraft browser client with WASM-first runtime, perfor
 
 | Version | Runtime | Notes |
 |---------|---------|-------|
-| **1.8.8** | WASM-GC + JS fallback | Most stable, best for PvP |
-| **1.12.2** | WASM-GC only | Heavier; use Chrome/Edge for best FPS |
+| **1.5.2** | JavaScript only | Legacy; server needs EaglerXRewind |
+| **1.8.8** | WASM-GC + JS fallback | Most stable, best for PvP & native 1.8 servers |
+| **1.12.2** | WASM-GC only | Best for Via-connected 1.16–1.21 servers |
+
+## ViaVersion support
+
+Use the **Server version (Via)** dropdown to pick what Minecraft version your server runs. Swift Client will:
+
+- Recommend the right Eaglercraft client (1.8 / 1.12)
+- Show whether the server needs **EaglerXServer + ViaVersion + ViaBackwards + ViaRewind**
+
+Via translation happens on the **server**, not in the browser client. Your server owner must install those plugins for 1.16+ backends.
 
 ## Features
 

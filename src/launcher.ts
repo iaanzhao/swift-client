@@ -1,9 +1,10 @@
 import { hasVersionAssets, launchGame } from "./loader";
 import { resolveRuntime, runtimeLabel } from "./runtime";
 import { loadSettings, saveSettings } from "./storage";
-import type { ClientSettings, McVersion, PerfPreset, Runtime } from "./types";
+import type { ClientSettings, McVersion, PerfPreset, Runtime, ViaTarget } from "./types";
 import { ClickGui } from "./overlay/clickGui";
 import { OverlayHud } from "./overlay/hud";
+import { recommendedClient, viaHint } from "./via";
 import { VERSIONS } from "./versions";
 
 let settings = loadSettings();
@@ -23,10 +24,26 @@ function updateVersionHint(): void {
   const hint = $("#version-hint");
   hint.textContent = VERSIONS[settings.version].tagline;
 
+  const viaEl = $("#via-hint");
+  viaEl.textContent = viaHint(settings.viaTarget, settings.version);
+
   const form = $("#launcher-form") as HTMLFormElement;
   const runtimeSelect = form.elements.namedItem("runtime") as HTMLSelectElement;
+  const wasmOption = runtimeSelect.querySelector('option[value="wasm"]') as HTMLOptionElement;
   const jsOption = runtimeSelect.querySelector('option[value="js"]') as HTMLOptionElement;
-  if (VERSIONS[settings.version].wasmOnly) {
+  const autoOption = runtimeSelect.querySelector('option[value="auto"]') as HTMLOptionElement;
+  const info = VERSIONS[settings.version];
+
+  if (info.jsOnly) {
+    autoOption.disabled = true;
+    wasmOption.disabled = true;
+    jsOption.disabled = false;
+    settings.runtime = "js";
+    runtimeSelect.value = "js";
+    saveSettings(settings);
+  } else if (info.wasmOnly) {
+    autoOption.disabled = false;
+    wasmOption.disabled = false;
     jsOption.disabled = true;
     if (settings.runtime === "js") {
       settings.runtime = "auto";
@@ -34,13 +51,25 @@ function updateVersionHint(): void {
     }
     runtimeSelect.value = settings.runtime;
   } else {
+    autoOption.disabled = false;
+    wasmOption.disabled = false;
     jsOption.disabled = false;
+  }
+}
+
+function applyViaRecommendation(): void {
+  const rec = recommendedClient(settings.viaTarget);
+  if (!rec || settings.viaTarget === "auto") return;
+  if (rec !== settings.version) {
+    settings.version = rec;
+    saveSettings(settings);
   }
 }
 
 function updateForm(): void {
   const form = $("#launcher-form") as HTMLFormElement;
   (form.elements.namedItem("version") as HTMLSelectElement).value = settings.version;
+  (form.elements.namedItem("viaTarget") as HTMLSelectElement).value = settings.viaTarget;
   (form.elements.namedItem("runtime") as HTMLSelectElement).value = settings.runtime;
   (form.elements.namedItem("perf") as HTMLSelectElement).value = settings.perfPreset;
   (form.elements.namedItem("joinServer") as HTMLInputElement).value = settings.joinServer;
@@ -54,7 +83,7 @@ function updateForm(): void {
       (s, i) => `
     <li>
       <button type="button" class="server-pick" data-idx="${i}">
-        <strong>${escapeHtml(s.name)}</strong>
+        <strong>${escapeHtml(s.name)}${s.via ? ' <span class="via-tag">Via</span>' : ""}</strong>
         <span>${escapeHtml(s.addr)}</span>
       </button>
       <button type="button" class="server-del" data-idx="${i}" title="Remove">×</button>
@@ -145,6 +174,8 @@ export function initLauncher(): void {
     e.preventDefault();
     settings.version = (form.elements.namedItem("version") as HTMLSelectElement)
       .value as McVersion;
+    settings.viaTarget = (form.elements.namedItem("viaTarget") as HTMLSelectElement)
+      .value as ViaTarget;
     settings.runtime = (form.elements.namedItem("runtime") as HTMLSelectElement)
       .value as Runtime;
     settings.perfPreset = (form.elements.namedItem("perf") as HTMLSelectElement)
@@ -161,6 +192,18 @@ export function initLauncher(): void {
     () => {
       settings.version = (form.elements.namedItem("version") as HTMLSelectElement)
         .value as McVersion;
+      saveSettings(settings);
+      updateForm();
+      refreshRuntimeBadge();
+    },
+  );
+
+  (form.elements.namedItem("viaTarget") as HTMLSelectElement).addEventListener(
+    "change",
+    () => {
+      settings.viaTarget = (form.elements.namedItem("viaTarget") as HTMLSelectElement)
+        .value as ViaTarget;
+      applyViaRecommendation();
       saveSettings(settings);
       updateForm();
       refreshRuntimeBadge();
@@ -189,12 +232,18 @@ export function initLauncher(): void {
   });
 
   $("#setup-hint")?.addEventListener("click", async () => {
-    const ok18 = await hasVersionAssets("1.8");
-    const ok112 = await hasVersionAssets("1.12");
-    if (!ok18 || !ok112) {
-      const missing = [!ok18 && "1.8.8", !ok112 && "1.12.2"].filter(Boolean).join(", ");
+    const checks: Array<[McVersion, string]> = [
+      ["1.5", "1.5.2"],
+      ["1.8", "1.8.8"],
+      ["1.12", "1.12.2"],
+    ];
+    const missing: string[] = [];
+    for (const [v, label] of checks) {
+      if (!(await hasVersionAssets(v))) missing.push(label);
+    }
+    if (missing.length) {
       alert(
-        `Missing game files: ${missing}\n\nRun in terminal:\n  cd swift-client\n  npm run setup\n\nThen refresh this page.`,
+        `Missing game files: ${missing.join(", ")}\n\nRun in terminal:\n  cd swift-client\n  npm run setup\n\nThen refresh this page.`,
       );
     } else {
       alert("All game files are installed. You're good to play!");
