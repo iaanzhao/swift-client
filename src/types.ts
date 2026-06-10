@@ -15,6 +15,7 @@ export interface ServerEntry {
 export interface ClientSettings {
   version: McVersion;
   viaTarget: ViaTarget;
+  viaBlocks: boolean;
   runtime: Runtime;
   perfPreset: PerfPreset;
   username: string;

@@ -3,6 +3,7 @@ import {
   jsAssetsPath,
   jsLocalesPath,
   storageNamespace,
+  usesViaBlocks,
   wasmAssetsPath,
   worldsDb,
 } from "./versions";
@@ -45,16 +46,19 @@ export function buildEaglerOpts(
   runtime: "wasm" | "js",
 ): EaglercraftXOpts {
   const version: McVersion = settings.version;
+  const viaBlocks = usesViaBlocks(settings);
   const relayId = Math.floor(Math.random() * 3);
   const base: EaglercraftXOpts = {
     demoMode: false,
     container: "game_frame",
     assetsURI:
-      runtime === "wasm" ? wasmAssetsPath(version) : jsAssetsPath(version),
+      runtime === "wasm"
+        ? wasmAssetsPath(version, viaBlocks)
+        : jsAssetsPath(version),
     localesURI: runtime === "js" && version === "1.8" ? jsLocalesPath(version) : undefined,
-    worldsDB: worldsDb(version),
-    resourcePacksDB: `${worldsDb(version)}_packs`,
-    localStorageNamespace: storageNamespace(version),
+    worldsDB: worldsDb(version, viaBlocks),
+    resourcePacksDB: `${worldsDb(version, viaBlocks)}_packs`,
+    localStorageNamespace: storageNamespace(version, viaBlocks),
     servers: settings.servers,
     relays: [
       { addr: "wss://relay.deev.is/", comment: "lax1dude relay #1", primary: relayId === 0 },

@@ -33,6 +33,7 @@ export function recommendedClient(via: ViaTarget): McVersion | null {
 }
 
 export function viaRequiresPlugins(via: ViaTarget): boolean {
+  // exported for launcher
   return via === "1.16" || via === "1.18" || via === "1.20" || via === "1.21";
 }
 
@@ -53,6 +54,7 @@ export function viaHint(via: ViaTarget, client: McVersion): string {
 
   if (viaRequiresPlugins(via)) {
     parts.push("Your server owner must install the Via suite on the backend.");
+    parts.push("Enable ViaBlocks below for newer block textures (Tuff engine).");
   }
 
   return parts.join(" ");

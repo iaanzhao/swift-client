@@ -5,6 +5,7 @@ const KEY = "swift-client-settings";
 const DEFAULTS: ClientSettings = {
   version: "1.8",
   viaTarget: "auto",
+  viaBlocks: false,
   runtime: "auto",
   perfPreset: "turbo",
   username: "",
@@ -46,6 +47,7 @@ export function loadSettings(): ClientSettings {
       ...parsed,
       version: parseVersion(parsed.version),
       viaTarget: parseViaTarget(parsed.viaTarget),
+      viaBlocks: parsed.viaBlocks === true,
     };
   } catch {
     return { ...DEFAULTS };

@@ -19,6 +19,16 @@ Use the **Server version (Via)** dropdown to pick what Minecraft version your se
 
 Via translation happens on the **server**, not in the browser client. Your server owner must install those plugins for 1.16+ backends.
 
+## ViaBlocks (Tuff engine)
+
+Enable **ViaBlocks** in the launcher when playing on 1.12.2 with 1.16–1.21 servers. This loads the [Tuff Client](https://github.com/TuffNetwork/Tuff-Client-Builds) WASM engine, which includes:
+
+- Newer block textures (deepslate, copper, etc.)
+- Y0 / below-bedrock support (with [TuffX](https://github.com/TuffNetwork/TuffX-Plugin) on the server)
+- WAILA, minimap, and Tuff's built-in ClickGUI
+
+Server requirements for full ViaBlocks: **TuffX + ViaVersion + ViaBackwards** on a 1.18+ backend.
+
 ## Features
 
 - **Version picker** — switch between 1.8.8 and 1.12.2 from the launcher

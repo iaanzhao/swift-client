@@ -8,6 +8,7 @@ BASE112="https://raw.githubusercontent.com/alexander-datskov/1.12-eaglercraftx/m
 mkdir -p "$ROOT/public/game/1.5/js"
 mkdir -p "$ROOT/public/game/1.8/wasm" "$ROOT/public/game/1.8/js"
 mkdir -p "$ROOT/public/game/1.12/wasm" "$ROOT/public/game/1.12/js"
+mkdir -p "$ROOT/public/game/tuff/wasm"
 
 # Migrate legacy layout if present
 if [[ -d "$ROOT/public/game/wasm" && ! -f "$ROOT/public/game/1.8/wasm/assets.epw" ]]; then
@@ -47,5 +48,12 @@ curl -fL -o "$ROOT/public/game/1.12/wasm/bootstrap.js" \
 echo "==> Downloading Eaglercraft 1.12.2 JS classes (optional fallback)..."
 curl -fL --progress-bar -o "$ROOT/public/game/1.12/js/classes.js" \
   "$BASE112/classes.js"
+
+echo "==> Downloading Tuff Client ViaBlocks engine (~23 MB)..."
+TUFF_ZIP="$ROOT/public/game/tuff-wasm.zip"
+curl -fL --progress-bar -o "$TUFF_ZIP" \
+  "https://github.com/TuffNetwork/Tuff-Client-Builds/releases/download/1.1UT14/WASM.zip"
+unzip -o -q "$TUFF_ZIP" -d "$ROOT/public/game/tuff/wasm"
+rm -f "$TUFF_ZIP"
 
 echo "==> Done. Run: npm run dev"

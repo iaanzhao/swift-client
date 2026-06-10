@@ -6,6 +6,8 @@ import {
   jsAssetsPath,
   jsLoaderPath,
   jsWebrtcPath,
+  tuffWasmAssetsPath,
+  usesViaBlocks,
   VERSIONS,
   wasmAssetsPath,
   wasmLoaderPath,
@@ -36,7 +38,18 @@ async function assetExists(url: string): Promise<boolean> {
   }
 }
 
-async function hasVersionAssets(version: McVersion): Promise<boolean> {
+async function hasTuffAssets(): Promise<boolean> {
+  const [loader, assets] = await Promise.all([
+    assetExists(wasmLoaderPath("1.12", true)),
+    assetExists(tuffWasmAssetsPath()),
+  ]);
+  return loader && assets;
+}
+
+async function hasVersionAssets(
+  version: McVersion,
+  viaBlocks = false,
+): Promise<boolean> {
   const info = VERSIONS[version];
   if (info.engine === "eagler15") {
     const [loader, assets] = await Promise.all([
@@ -44,6 +57,9 @@ async function hasVersionAssets(version: McVersion): Promise<boolean> {
       assetExists(jsAssetsPath(version)),
     ]);
     return loader && assets;
+  }
+  if (viaBlocks && version === "1.12") {
+    return hasTuffAssets();
   }
   const wasmOk = await assetExists(wasmAssetsPath(version));
   const jsOk = await assetExists(jsLoaderPath(version));
@@ -76,27 +92,42 @@ async function launchEaglerX(
   settings: ClientSettings,
 ): Promise<"wasm" | "js"> {
   const version = settings.version;
+  const viaBlocks = usesViaBlocks(settings);
   let runtime = await resolveRuntime(settings.runtime, version);
 
-  const wasmOk = await assetExists(wasmAssetsPath(version));
-  const jsOk =
-    version === "1.8"
-      ? (await assetExists(jsLoaderPath(version))) &&
-        (await assetExists(jsAssetsPath(version)))
-      : false;
+  if (viaBlocks) {
+    runtime = "wasm";
+    if (!(await hasTuffAssets())) {
+      throw new Error(
+        "ViaBlocks (Tuff engine) files missing. Run `npm run setup` to download them.",
+      );
+    }
+  }
 
-  if (!wasmOk && !jsOk) {
+  const wasmOk = await assetExists(wasmAssetsPath(version, viaBlocks));
+  const jsOk =
+    !viaBlocks &&
+    version === "1.8" &&
+    (await assetExists(jsLoaderPath(version))) &&
+    (await assetExists(jsAssetsPath(version)));
+
+  if (!viaBlocks && !wasmOk && !jsOk) {
     throw new Error(
       `Minecraft ${VERSIONS[version].label} files missing. Run \`npm run setup\` to download assets.`,
     );
   }
 
-  if (runtime === "wasm" && !wasmOk) runtime = "js";
-  if (runtime === "js" && !jsOk) runtime = "wasm";
+  if (!viaBlocks) {
+    if (runtime === "wasm" && !wasmOk) runtime = "js";
+    if (runtime === "js" && !jsOk) runtime = "wasm";
+  }
 
   window.eaglercraftXOpts = buildEaglerOpts(settings, runtime);
 
-  const script = runtime === "wasm" ? wasmLoaderPath(version) : jsLoaderPath(version);
+  const script =
+    runtime === "wasm"
+      ? wasmLoaderPath(version, viaBlocks)
+      : jsLoaderPath(version);
   await loadScript(script);
 
   if (typeof window.main !== "function") {
@@ -109,16 +140,16 @@ async function launchEaglerX(
 
 export async function launchGame(
   settings: ClientSettings,
-): Promise<{ runtime: "wasm" | "js"; version: McVersion }> {
+): Promise<{ runtime: "wasm" | "js"; version: McVersion; viaBlocks: boolean }> {
   const version = settings.version;
 
   if (VERSIONS[version].engine === "eagler15") {
     await launchEagler15(settings);
-    return { runtime: "js", version };
+    return { runtime: "js", version, viaBlocks: false };
   }
 
   const runtime = await launchEaglerX(settings);
-  return { runtime, version };
+  return { runtime, version, viaBlocks: usesViaBlocks(settings) };
 }
 
-export { hasVersionAssets };
+export { hasTuffAssets, hasVersionAssets };
